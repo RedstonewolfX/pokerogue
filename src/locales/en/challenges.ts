@@ -28,5 +28,11 @@ export const challenges: TranslationEntries = {
     "desc": "You can only use the original starters, and only as if you had just started PokéRogue.",
     "value.0": "Off",
     "value.1": "On",
+  },
+  "randomizer": {
+    "name": "Randomizer",
+    "desc": "{}",
+    "value.0": "Off",
+    "value.1": "On",
   }
 } as const;

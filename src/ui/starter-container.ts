@@ -1,3 +1,5 @@
+import { getEggTierForSpecies } from "#app/data/egg.js";
+import { Challenges } from "#app/enums/challenges.js";
 import BattleScene from "../battle-scene";
 import PokemonSpecies from "../data/pokemon-species";
 import { addTextObject, TextStyle } from "./text";
@@ -105,6 +107,26 @@ export class StarterContainer extends Phaser.GameObjects.Container {
       console.log(`${this.species.name}'s variant icon does not exist. Replacing with default.`);
       this.icon.setTexture(this.species.getIconAtlasKey(formIndex, false, variant));
       this.icon.setFrame(this.species.getIconId(female, formIndex, false, variant));
+    }
+  }
+  checkIconIdAlt(female, formIndex, shiny, variant) {
+    if (this.scene.isRandomized) {
+      // Randomized
+      this.shinyIcons.forEach(i => {
+        i.setVisible(false)
+      })
+      //this.hiddenAbilityIcon.setVisible(false)
+      this.favoriteIcon.setVisible(false)
+      this.candyUpgradeOverlayIcon.setVisible(false)
+      this.classicWinIcon.setVisible(false)
+      //this.icon.setTexture("egg_icons");
+      //this.icon.setFrame(getEggTierForSpecies(this.species.secretMapping));
+      //return;
+    }
+    if (this.icon.frame.name !== this.species.secretMapping.getIconId(female, formIndex, shiny, variant)) {
+      console.log(`${this.species.secretMapping.name}'s variant icon does not exist. Replacing with default.`);
+      this.icon.setTexture(this.species.secretMapping.getIconAtlasKey(formIndex, false, variant));
+      this.icon.setFrame(this.species.secretMapping.getIconId(female, formIndex, false, variant));
     }
   }
 }

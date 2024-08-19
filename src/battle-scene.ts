@@ -229,6 +229,8 @@ export default class BattleScene extends SceneBase {
   private enemyModifierBar: ModifierBar;
   public arenaFlyout: ArenaFlyout;
 
+  public isRandomized: boolean = false;
+
   private fieldOverlay: Phaser.GameObjects.Rectangle;
   private shopOverlay: Phaser.GameObjects.Rectangle;
   private shopOverlayShown: boolean = false;
@@ -282,6 +284,7 @@ export default class BattleScene extends SceneBase {
     this.conditionalQueue = [];
     this.phaseQueuePrependSpliceIndex = -1;
     this.nextCommandPhaseQueue = [];
+    this.isRandomized = false;
     this.updateGameInfo();
   }
 
@@ -2421,6 +2424,7 @@ export default class BattleScene extends SceneBase {
         getEnemyModifierTypesForWave(difficultyWaveIndex, count, [ enemyPokemon ], this.currentBattle.battleType === BattleType.TRAINER ? ModifierPoolType.TRAINER : ModifierPoolType.WILD, upgradeChance)
           .map(mt => mt.newModifier(enemyPokemon).add(this.enemyModifiers, false, this));
       });
+
       this.updateModifiers(false).then(() => resolve());
     });
   }

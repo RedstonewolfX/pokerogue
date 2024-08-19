@@ -1,7 +1,7 @@
 import * as Utils from "../utils";
 import i18next from "i18next";
 import { defaultStarterSpecies, DexAttrProps, GameData } from "#app/system/game-data.js";
-import PokemonSpecies, { getPokemonSpecies, getPokemonSpeciesForm, speciesStarters } from "./pokemon-species";
+import PokemonSpecies, { allSpecies, getPokemonSpecies, getPokemonSpeciesForm, speciesStarters } from "./pokemon-species";
 import Pokemon, { PokemonMove } from "#app/field/pokemon.js";
 import { BattleType, FixedBattleConfig } from "#app/battle.js";
 import Trainer, { TrainerVariant } from "#app/field/trainer.js";
@@ -30,6 +30,11 @@ export enum ChallengeType {
    * @see {@link Challenge.applyStarterChoice}
   */
   STARTER_CHOICE,
+  /**
+   * Challenges which modify the starters shown in the starter select
+   * @see {@link Challenge.applyStarterMenu}
+  */
+  STARTER_MENU,
   /**
    * Challenges which modify how many starter points you have
    * @see {@link Challenge.applyStarterPoints}
@@ -276,6 +281,19 @@ export abstract class Challenge {
    * @returns {@link boolean} Whether this function did anything.
    */
   applyStarterChoice(pokemon: PokemonSpecies, valid: Utils.BooleanHolder, dexAttr: DexAttrProps, soft: boolean = false): boolean {
+    return false;
+  }
+
+  /**
+   * An apply function for STARTER_CHOICE challenges. Derived classes should alter this.
+   * @param pokemon {@link PokemonSpecies} The pokemon to check the validity of.
+   * @param valid {@link Utils.BooleanHolder} A BooleanHolder, the value gets set to false if the pokemon isn't allowed.
+   * @param dexAttr {@link DexAttrProps} The dex attributes of the pokemon.
+   * @param soft {@link boolean} If true, allow it if it could become a valid pokemon.
+   * @returns {@link boolean} Whether this function did anything.
+   */
+  applyStarterMenu(speciesSim: Array<PokemonSpecies>, arrayin: Array<PokemonSpecies>): boolean {
+    // allSpecies.slice()
     return false;
   }
 
@@ -666,6 +684,83 @@ export class FreshStartChallenge extends Challenge {
   }
 }
 
+export class RandomizerChallenge extends Challenge {
+  public randomModes: string[] = [
+    "Off",
+    "On"
+  ]
+  public randomModesDesc: string[] = [
+    "1",
+    "2"
+  ]
+
+  constructor() {
+    super(Challenges.RANDOMIZER, 1);
+  }
+
+  applyStarterModify(pokemon: Pokemon): boolean {
+    /*
+    pokemon.species = getPokemonSpecies(Phaser.Math.RND.pick(allSpecies).speciesId)
+    if (pokemon.species.forms) {
+      var maxindex = pokemon.species.forms.length;
+      var formIndex = Math.max(Math.floor(Math.random() * (maxindex+2)) - 2, 0)
+      pokemon.formIndex = formIndex
+      pokemon.species.formIndex = formIndex
+    }
+    */
+    return false;
+  }
+
+  applyStarterMenu(speciesSim: Array<PokemonSpecies>, arrayin: Array<PokemonSpecies>): boolean {
+    speciesSim = allSpecies.slice()
+    if (arrayin) {
+      speciesSim = arrayin.slice()
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @overrides
+   */
+  getDifficulty(): number {
+    return this.value > 0 ? 1 : 0;
+  }
+
+  /**
+   * Returns the textual representation of a challenge's current value.
+   * @param {value} overrideValue The value to check for. If undefined, gets the current value.
+   * @returns {string} The localised name for the current value.
+   */
+  getValue(overrideValue?: integer): string {
+    if (overrideValue === undefined) {
+      overrideValue = this.value;
+    }
+    return this.randomModes[this.value]
+  }
+
+  /**
+   * Returns the description of a challenge's current value.
+   * @param {value} overrideValue The value to check for. If undefined, gets the current value.
+   * @returns {string} The localised description for the current value.
+   */
+  getDescription(overrideValue?: integer): string {
+    if (overrideValue === undefined) {
+      overrideValue = this.value;
+    }
+    const defaultDesc = i18next.t("challenges:randomizer.desc_default");
+    const typeDesc = i18next.t("challenges:randomizer.desc", {mode: this.randomModesDesc[this.value]});
+    return this.randomModesDesc[this.value]
+  }
+
+  static loadChallenge(source: RandomizerChallenge | any): RandomizerChallenge {
+    const newChallenge = new RandomizerChallenge();
+    newChallenge.value = source.value;
+    newChallenge.severity = source.severity;
+    return newChallenge;
+  }
+}
+
 /**
  * Lowers the amount of starter points available.
  */
@@ -750,6 +845,10 @@ export function applyChallenges(gameMode: GameMode, challengeType: ChallengeType
  * @returns True if any challenge was successfully applied.
  */
 export function applyChallenges(gameMode: GameMode, challengeType: ChallengeType.STARTER_POINTS, points: Utils.NumberHolder): boolean;
+/**
+ * 
+ */
+export function applyChallenges(gameMode: GameMode, challengeType: ChallengeType.STARTER_MENU, inputArray: Array<PokemonSpecies>, input2: Array<PokemonSpecies>): boolean;
 /**
  * Apply all challenges that modify the cost of a starter.
  * @param gameMode {@link GameMode} The current gameMode
@@ -851,6 +950,9 @@ export function applyChallenges(gameMode: GameMode, challengeType: ChallengeType
       case ChallengeType.STARTER_CHOICE:
         ret ||= c.applyStarterChoice(args[0], args[1], args[2], args[3]);
         break;
+      case ChallengeType.STARTER_MENU:
+        ret ||= c.applyStarterMenu(args[0], args[1]);
+        break;
       case ChallengeType.STARTER_POINTS:
         ret ||= c.applyStarterPoints(args[0]);
         break;
@@ -907,6 +1009,8 @@ export function copyChallenge(source: Challenge | any): Challenge {
     return LowerStarterPointsChallenge.loadChallenge(source);
   case Challenges.FRESH_START:
     return FreshStartChallenge.loadChallenge(source);
+  case Challenges.RANDOMIZER:
+    return RandomizerChallenge.loadChallenge(source);
   }
   throw new Error("Unknown challenge copied");
 }
@@ -918,5 +1022,6 @@ export function initChallenges() {
     new SingleGenerationChallenge(),
     new SingleTypeChallenge(),
     new FreshStartChallenge(),
+    new RandomizerChallenge(),
   );
 }

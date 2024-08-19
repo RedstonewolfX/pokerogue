@@ -110,6 +110,8 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
   public maskEnabled: boolean;
   public maskSprite: Phaser.GameObjects.Sprite | null;
 
+  public randomizerOverride: PokemonSpecies;
+
   private shinySparkle: Phaser.GameObjects.Sprite;
 
   constructor(scene: BattleScene, x: number, y: number, species: PokemonSpecies, level: integer, abilityIndex?: integer, formIndex?: integer, gender?: Gender, shiny?: boolean, variant?: Variant, ivs?: integer[], nature?: Nature, dataSource?: Pokemon | PokemonData) {
@@ -1039,6 +1041,13 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
     }
 
     let starterSpeciesId = this.species.speciesId;
+    if (this.randomizerOverride) {
+      let otherSpeciesId = this.randomizerOverride.speciesId;
+      while (pokemonPrevolutions.hasOwnProperty(otherSpeciesId)) {
+        otherSpeciesId = pokemonPrevolutions[otherSpeciesId];
+      }
+      return allAbilities[starterPassiveAbilities[otherSpeciesId]];
+    }
     while (pokemonPrevolutions.hasOwnProperty(starterSpeciesId)) {
       starterSpeciesId = pokemonPrevolutions[starterSpeciesId];
     }
@@ -1210,11 +1219,11 @@ export default abstract class Pokemon extends Phaser.GameObjects.Container {
    *
    * @param source - The Pokémon using the move.
    * @param move - The move being used.
-   * @returns The type damage multiplier or 1 if it's a status move
+   * @returns The type damage multiplier or undefined if it's a status move
    */
-  getMoveEffectiveness(source: Pokemon, move: PokemonMove): TypeDamageMultiplier {
+  getMoveEffectiveness(source: Pokemon, move: PokemonMove): TypeDamageMultiplier | undefined {
     if (move.getMove().category === MoveCategory.STATUS) {
-      return 1;
+      return undefined;
     }
 
     return this.getAttackMoveEffectiveness(source, move, !this.battleData?.abilityRevealed);

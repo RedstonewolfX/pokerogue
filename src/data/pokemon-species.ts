@@ -583,6 +583,10 @@ export default class PokemonSpecies extends PokemonSpeciesForm implements Locali
   public genderDiffs: boolean;
   public canChangeForm: boolean;
   public forms: PokemonForm[];
+  public speciesListId: number;
+  public secretMapping: PokemonSpecies;
+  public backMapping: PokemonSpecies;
+  public scrambleMapping: integer;
 
   constructor(id: Species, generation: integer, subLegendary: boolean, legendary: boolean, mythical: boolean, species: string,
     type1: Type, type2: Type | null, height: number, weight: number, ability1: Abilities, ability2: Abilities, abilityHidden: Abilities,
@@ -592,6 +596,7 @@ export default class PokemonSpecies extends PokemonSpeciesForm implements Locali
     super(type1, type2, height, weight, ability1, ability2, abilityHidden, baseTotal, baseHp, baseAtk, baseDef, baseSpatk, baseSpdef, baseSpd,
       catchRate, baseFriendship, baseExp, genderDiffs, false);
     this.speciesId = id;
+    this.speciesListId = allSpecies.length;
     this.formIndex = 0;
     this.generation = generation;
     this.subLegendary = subLegendary;
@@ -1675,7 +1680,6 @@ export function initSpecies() {
       new PokemonForm("Fairy", "fairy", Type.FAIRY, null, 3.2, 320, Abilities.MULTITYPE, Abilities.NONE, Abilities.NONE, 720, 120, 120, 120, 120, 120, 120, 3, 0, 324),
       new PokemonForm("???", "unknown", Type.UNKNOWN, null, 3.2, 320, Abilities.MULTITYPE, Abilities.NONE, Abilities.NONE, 720, 120, 120, 120, 120, 120, 120, 3, 0, 324),
     ),
-    new PokemonSpecies(Species.VICTINI, 5, false, false, true, "Victory Pokémon", Type.PSYCHIC, Type.FIRE, 0.4, 4, Abilities.VICTORY_STAR, Abilities.NONE, Abilities.NONE, 600, 100, 100, 100, 100, 100, 100, 3, 100, 300, GrowthRate.SLOW, null, false),
     new PokemonSpecies(Species.SNIVY, 5, false, false, false, "Grass Snake Pokémon", Type.GRASS, null, 0.6, 8.1, Abilities.OVERGROW, Abilities.NONE, Abilities.CONTRARY, 308, 45, 45, 55, 45, 55, 63, 45, 70, 62, GrowthRate.MEDIUM_SLOW, 87.5, false),
     new PokemonSpecies(Species.SERVINE, 5, false, false, false, "Grass Snake Pokémon", Type.GRASS, null, 0.8, 16, Abilities.OVERGROW, Abilities.NONE, Abilities.CONTRARY, 413, 60, 60, 75, 60, 75, 83, 45, 70, 145, GrowthRate.MEDIUM_SLOW, 87.5, false),
     new PokemonSpecies(Species.SERPERIOR, 5, false, false, false, "Regal Pokémon", Type.GRASS, null, 3.3, 63, Abilities.OVERGROW, Abilities.NONE, Abilities.CONTRARY, 528, 75, 75, 95, 75, 95, 113, 45, 70, 238, GrowthRate.MEDIUM_SLOW, 87.5, false),
@@ -1879,6 +1883,7 @@ export function initSpecies() {
       new PokemonForm("Chill Drive", "chill", Type.BUG, Type.STEEL, 1.5, 82.5, Abilities.DOWNLOAD, Abilities.NONE, Abilities.NONE, 600, 71, 120, 95, 120, 95, 99, 3, 0, 300),
       new PokemonForm("Douse Drive", "douse", Type.BUG, Type.STEEL, 1.5, 82.5, Abilities.DOWNLOAD, Abilities.NONE, Abilities.NONE, 600, 71, 120, 95, 120, 95, 99, 3, 0, 300),
     ),
+    new PokemonSpecies(Species.VICTINI, 5, false, false, true, "Victory Pokémon", Type.PSYCHIC, Type.FIRE, 0.4, 4, Abilities.VICTORY_STAR, Abilities.NONE, Abilities.NONE, 600, 100, 100, 100, 100, 100, 100, 3, 100, 300, GrowthRate.SLOW, null, false),
     new PokemonSpecies(Species.CHESPIN, 6, false, false, false, "Spiny Nut Pokémon", Type.GRASS, null, 0.4, 9, Abilities.OVERGROW, Abilities.NONE, Abilities.BULLETPROOF, 313, 56, 61, 65, 48, 45, 38, 45, 70, 63, GrowthRate.MEDIUM_SLOW, 87.5, false),
     new PokemonSpecies(Species.QUILLADIN, 6, false, false, false, "Spiny Armor Pokémon", Type.GRASS, null, 0.7, 29, Abilities.OVERGROW, Abilities.NONE, Abilities.BULLETPROOF, 405, 61, 78, 95, 56, 58, 57, 45, 70, 142, GrowthRate.MEDIUM_SLOW, 87.5, false),
     new PokemonSpecies(Species.CHESNAUGHT, 6, false, false, false, "Spiny Armor Pokémon", Type.GRASS, Type.FIGHTING, 1.6, 90, Abilities.OVERGROW, Abilities.NONE, Abilities.BULLETPROOF, 530, 88, 107, 122, 74, 75, 64, 45, 70, 239, GrowthRate.MEDIUM_SLOW, 87.5, false),

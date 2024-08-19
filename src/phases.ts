@@ -603,6 +603,9 @@ export class SelectStarterPhase extends Phase {
         starter.species = getPokemonSpecies(Overrides.STARTER_SPECIES_OVERRIDE as Species);
       }
       const starterProps = this.scene.gameData.getSpeciesDexAttrProps(starter.species, starter.dexAttr);
+      if (starter.formoverride) {
+        starterProps.formIndex = starter.formoverride
+      }
       let starterFormIndex = Math.min(starterProps.formIndex, Math.max(starter.species.forms.length - 1, 0));
       if (
         starter.species.speciesId in Overrides.STARTER_FORM_OVERRIDES &&
@@ -623,6 +626,8 @@ export class SelectStarterPhase extends Phase {
       if (starter.passive) {
         starterPokemon.passive = true;
       }
+      starterPokemon.randomizerOverride = starter.species.backMapping
+      console.log(starter.species.backMapping.name + " --> " + starter.species.name)
       starterPokemon.luck = this.scene.gameData.getDexAttrLuck(this.scene.gameData.dexData[starter.species.speciesId].caughtAttr);
       if (starter.pokerus) {
         starterPokemon.pokerus = true;
@@ -631,6 +636,8 @@ export class SelectStarterPhase extends Phase {
       if (starter.nickname) {
         starterPokemon.nickname = starter.nickname;
       }
+
+      console.log(starterPokemon.getAbility().name, starterPokemon.getPassiveAbility().name)
 
       if (this.scene.gameMode.isSplicedOnly) {
         starterPokemon.generateFusionSpecies(true);
@@ -878,10 +885,6 @@ export class EncounterPhase extends BattlePhase {
         } else if (!(battle.waveIndex % 1000)) {
           enemyPokemon.formIndex = 1;
           enemyPokemon.updateScale();
-          const bossMBH = this.scene.findModifier(m => m instanceof TurnHeldItemTransferModifier && m.pokemonId === enemyPokemon.id, false) as TurnHeldItemTransferModifier;
-          this.scene.removeModifier(bossMBH!);
-          bossMBH?.setTransferrableFalse();
-          this.scene.addEnemyModifier(bossMBH!);
         }
       }
 
