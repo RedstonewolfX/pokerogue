@@ -138,6 +138,8 @@ export const modifierType: ModifierTypeTranslationEntries = {
 
     "MAP": { name: "Map", description: "Allows you to choose your destination at a crossroads." },
 
+    "COMPASS": { name: "Compass", description: "Rare biomes appear more frequently." },
+
     "POTION": { name: "Potion" },
     "SUPER_POTION": { name: "Super Potion" },
     "HYPER_POTION": { name: "Hyper Potion" },

@@ -1288,6 +1288,7 @@ export const modifierTypes = {
   TERA_ORB: () => new ModifierType("modifierType:ModifierType.TERA_ORB", "tera_orb", (type, _args) => new Modifiers.TerastallizeAccessModifier(type)),
 
   MAP: () => new ModifierType("modifierType:ModifierType.MAP", "map", (type, _args) => new Modifiers.MapModifier(type)),
+  COMPASS: () => new ModifierType("modifierType:ModifierType.COMPASS", "map", (type, _args) => new Modifiers.BiomeRateBoosterModifier(type)),
 
   POTION: () => new PokemonHpRestoreModifierType("modifierType:ModifierType.POTION", "potion", 20, 10),
   SUPER_POTION: () => new PokemonHpRestoreModifierType("modifierType:ModifierType.SUPER_POTION", "super_potion", 50, 25),
@@ -1491,6 +1492,7 @@ function hasMaximumBalls(party: Pokemon[], ballType: PokeballType): boolean {
 
 const modifierPool: ModifierPool = {
   [ModifierTier.COMMON]: [
+    new WeightedModifierType(modifierTypes.COMPASS, (party: Pokemon[]) => (!party[0].scene.gameMode.isClassic || party[0].scene.currentBattle.waveIndex < 180) ? 8 : 0, 8),
     new WeightedModifierType(modifierTypes.POKEBALL, (party: Pokemon[]) => (hasMaximumBalls(party, PokeballType.POKEBALL)) ? 0 : 6, 6),
     new WeightedModifierType(modifierTypes.RARE_CANDY, 2),
     new WeightedModifierType(modifierTypes.POTION, (party: Pokemon[]) => {
@@ -1601,6 +1603,7 @@ const modifierPool: ModifierPool = {
       }
       return 0;
     }),
+    new WeightedModifierType(modifierTypes.COMPASS, (party: Pokemon[]) => (!party[0].scene.gameMode.isClassic || party[0].scene.currentBattle.waveIndex < 180) ? Math.min(Math.ceil(party[0].scene.currentBattle.waveIndex / 30), 8) : 0, 8),
     new WeightedModifierType(modifierTypes.SPECIES_STAT_BOOSTER, 12),
     new WeightedModifierType(modifierTypes.LEEK, (party: Pokemon[]) => {
       const checkedSpecies = [ Species.FARFETCHD, Species.GALAR_FARFETCHD, Species.SIRFETCHD ];

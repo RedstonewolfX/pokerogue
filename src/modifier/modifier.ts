@@ -418,6 +418,28 @@ export class MapModifier extends PersistentModifier {
   }
 }
 
+export class BiomeRateBoosterModifier extends PersistentModifier {
+  constructor(type: ModifierType, stackCount?: integer) {
+    super(type, stackCount);
+  }
+
+  match(modifier: Modifier): boolean {
+    return modifier instanceof BiomeRateBoosterModifier;
+  }
+
+  clone(): MapModifier {
+    return new BiomeRateBoosterModifier(this.type, this.stackCount);
+  }
+
+  apply(args: any[]): boolean {
+    return true;
+  }
+
+  getMaxStackCount(scene: BattleScene): integer {
+    return 3;
+  }
+}
+
 export class MegaEvolutionAccessModifier extends PersistentModifier {
   constructor(type: ModifierType, stackCount?: integer) {
     super(type, stackCount);
